@@ -1,8 +1,8 @@
-##----------------------------------------------------------------------------------------##
-##Author:   Emily McGovern
-##Date:     June 2022
-##Task:     Statisical task for recruitment process
-##Data Source: https://raw.githubusercontent.com/globaldothealth/monkeypox/main/latest.csv
+##--------------------------------------------------------------------------------------------##
+## Author:   Emily McGovern
+## Date:     June 2022
+## Task:     Statisical task for recruitment process
+## Data Source: https://raw.githubusercontent.com/globaldothealth/monkeypox/main/latest.csv
 ##--------------------------------------------------------------------------------------------##
 #Data setup
 require(pacman)
@@ -17,10 +17,11 @@ list.files(here::here("R"), full.names = T) %>%
 
 
 #make output dir
-out.dir<-base::format(Sys.Date(), "%d-%B-%y")
+dir.name<-base::format(Sys.Date(), "%d-%B-%y")
+out.dir<-paste0(here("out/Monkey-Pox/"),dir.name)
 
 #check if directory exists - if not create daily directory 
-if(!dir.exists(paste0(here("out/Monkey-Pox/"), out.dir))) {dir.create(paste0(here("out/Monkey-Pox/"), out.dir))}
+if(!base::dir.exists(out.dir)) {base::dir.create(out.dir)}
 
 #retrive latest Monkey Pox data
 mp.data <- readr::read_csv("https://raw.githubusercontent.com/globaldothealth/monkeypox/main/latest.csv")
@@ -69,7 +70,7 @@ p2<-plot_theme(p)
 
 
 # Save plot
-ggplot2::ggsave(filename = (paste0(here("out/Monkey-Pox/"), out.dir, "/mpplot-rolling_mean", out.dir, ".png")), 
+ggplot2::ggsave(filename = (paste0(out.dir, "/mpplot-rolling_mean", dir.name, ".png")), 
                 width = 40, height = 20, dpi = 320, units = "cm")
 
 

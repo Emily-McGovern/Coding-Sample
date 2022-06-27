@@ -1,8 +1,8 @@
-##----------------------------------------------------------------------------------------##
-##Author:   Emily McGovern
-##Date:     June 2022
-##Task:     Statistical programming task for recruitment process - survival analysis
-##Data Source: survival package R (https://cran.r-project.org/web/packages/survival/index.html)
+##--------------------------------------------------------------------------------------------##
+## Author:   Emily McGovern
+## Date:     June 2022
+## Task:     Statistical programming task for recruitment process - survival analysis
+## Data Source: survival package R (https://cran.r-project.org/web/packages/survival/index.html)
 ##--------------------------------------------------------------------------------------------##
 #Data setup
 require(pacman)
@@ -11,11 +11,13 @@ pacman::p_load(tidyverse,
                survival,
                survminer,
                here)
+
 #output directory 
-out.dir<-base::format(Sys.Date(), "%d-%B-%y")
+dir.name<-base::format(Sys.Date(), "%d-%B-%y")
+out.dir<-paste0(here("out/Survival-data/"),dir.name)
 
 #check if directory exists - if not create daily directory 
-if(!base::dir.exists(paste0(here("out/Survival-data/"), out.dir))) {base::dir.create(paste0(here("out/Survival-data/"), out.dir))}
+if(!base::dir.exists(out.dir)) {base::dir.create(out.dir)}
 
 # use survival vetaran data 
 data <- survival::veteran
@@ -75,7 +77,7 @@ final.plot<-ggpubr::ggarrange(plot, table,
                                heights = c(1, 0.3, 0.5), align = "v")
 
 #save plot
-ggplot2::ggsave(filename = (paste0(here("out/Survival-data/"), out.dir, "/surv-plot-", out.dir, ".png")), 
+ggplot2::ggsave(filename = paste0(out.dir, "/surv-plot-", dir.name, ".png"), 
                 width = 40, height = 20, dpi = 320, units = "cm")
 
 

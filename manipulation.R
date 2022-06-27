@@ -1,8 +1,8 @@
-##----------------------------------------------------------------------------------------##
-##Author:   Emily McGovern
-##Date:     June 2022
-##Task:     Data manipulation for recruitment process
-##Data Source: https://raw.githubusercontent.com/globaldothealth/monkeypox/main/latest.csv
+##--------------------------------------------------------------------------------------------##
+## Author:   Emily McGovern
+## Date:     June 2022
+## Task:     Data manipulation for recruitment process
+## Data Source: https://raw.githubusercontent.com/globaldothealth/monkeypox/main/latest.csv
 ##--------------------------------------------------------------------------------------------##
 
 #Data setup
@@ -20,17 +20,18 @@ base::list.files(here::here("R"), full.names = T) %>%
 
 
 #make output dir
-out.dir<-base::format(Sys.Date(), "%d-%B-%y")
+dir.name<-base::format(Sys.Date(), "%d-%B-%y")
+out.dir<-paste0(here("out/Monkey-Pox/"),dir.name)
 
 #check if directory exists - if not create daily directory 
-if(!base::dir.exists(paste0(here("out/Monkey-Pox/"), out.dir))) {base::dir.create(paste0(here("out/Monkey-Pox/"), out.dir))}
+if(!base::dir.exists(out.dir)) {base::dir.create(out.dir)}
 
 #retrive latest Monkey Pox data
 mp.data <- readr::read_csv("https://raw.githubusercontent.com/globaldothealth/monkeypox/main/latest.csv")
 
 #save daily data as record
 
-utils::write.csv(mp.data, file=gzfile(paste0(here("out/Monkey-Pox/"), out.dir, "/mpdata-", out.dir, ".csv.gz")))
+utils::write.csv(mp.data, file=gzfile(paste0(out.dir, "/mpdata-", dir.name, ".csv.gz")))
 
 
 #quick look at the data structure and fields
@@ -40,7 +41,8 @@ dplyr::glimpse(mp.data)
 base::summary(mp.data)
 
 #create new required variables and tidy data
-mp.cases<-mp.data %>%
+mp.cases <-
+  mp.data %>%
   tidyr::replace_na(list(Gender="unknown")) %>%
   dplyr::mutate(region= countrycode::countrycode(sourcevar = Country_ISO3, origin = "iso3c",destination = "region"),
                 Gender = base::factor(Gender, levels=c("female", "male", "unknown"))) %>%  #add variable for region which corresponds with country
@@ -53,9 +55,10 @@ mp.cases<-mp.data %>%
   dplyr::arrange(desc(Date_confirmation), desc(Total), Country)
 
 
-write_csv(mp.cases, file=(paste0(here("out/Monkey-Pox/"), out.dir, "/mpcases_summary-", out.dir, ".csv")))
+readr::write_csv(mp.cases, file=(paste0(out.dir, "/mpcases_summary-", dir.name, ".csv")))
 
-top.countries.per.reg<-mp.cases %>% 
+top.countries.per.reg<-
+  mp.cases %>% 
   dplyr::ungroup() %>% 
   dplyr::slice(1:n()-1) %>% 
   dplyr::group_by(region,Country) %>% 
@@ -63,7 +66,7 @@ top.countries.per.reg<-mp.cases %>%
   dplyr::arrange(desc(total_cases)) %>% 
   dplyr::slice(1:10)
 
-readr::write_csv(top.countries.per.reg, file=(paste0(here("out/Monkey-Pox/"), out.dir, "/mpcases-top-ten-cases-by-country-region", out.dir, ".csv")))
+readr::write_csv(top.countries.per.reg, file=(paste0(out.dir, "/mpcases-top-ten-cases-by-country-region", dir.name, ".csv")))
 
 
 mp.cases.plot <-
@@ -73,15 +76,16 @@ mp.cases.plot <-
                 top_10 = ifelse(Country %in% top.countries.per.reg$Country, Country, "Other")) 
 
 # initial plot
-p<-mp.cases.plot %>% 
+p <-
+  mp.cases.plot %>% 
   ggplot2::ggplot(aes(x = Date_confirmation, y = Total, fill = top_10)) +
   ggplot2::geom_bar(position='stack', 
-           stat='identity') +
+                    stat='identity') +
   ggplot2::theme(legend.position="none")+
   ggplot2::scale_x_date(date_breaks = "1 week", date_minor_breaks = "1 day",
-               date_labels = "%d %b")+
+                        date_labels = "%d %b")+
   ggplot2::scale_y_continuous(limits=c(0,round(max(mp.cases.plot$Total), digits = -1)), 
-                     breaks=seq(0,round(max(mp.cases.plot$Total), digits = -1), by = 25))+ 
+                              breaks=seq(0,round(max(mp.cases.plot$Total), digits = -1), by = 25))+ 
   ggplot2::coord_flip()+
   ggplot2::facet_wrap(vars(region))
 
@@ -104,6 +108,6 @@ p2<-plot_theme(p)
 
 
 # Save plot
-ggsave(filename = (paste0(here("out/Monkey-Pox/"), out.dir, "/mpplot-", out.dir, ".png")), 
+ggsave(filename = (paste0(out.dir, "/mpplot-", dir.name, ".png")), 
        width = 40, height = 20, dpi = 320, units = "cm")
 
