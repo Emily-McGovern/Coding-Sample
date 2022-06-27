@@ -1,0 +1,30 @@
+region,Country,total_cases
+East Asia & Pacific,Australia,13
+East Asia & Pacific,Singapore,1
+East Asia & Pacific,South Korea,1
+East Asia & Pacific,Taiwan,1
+Europe & Central Asia,England,873
+Europe & Central Asia,Spain,736
+Europe & Central Asia,Germany,676
+Europe & Central Asia,Portugal,348
+Europe & Central Asia,France,330
+Europe & Central Asia,Netherlands,211
+Europe & Central Asia,Italy,127
+Europe & Central Asia,Belgium,77
+Europe & Central Asia,Switzerland,55
+Europe & Central Asia,Ireland,28
+Latin America & Caribbean,Brazil,11
+Latin America & Caribbean,Mexico,9
+Latin America & Caribbean,Argentina,4
+Latin America & Caribbean,Chile,3
+Latin America & Caribbean,Colombia,3
+Latin America & Caribbean,Venezuela,1
+Middle East & North Africa,Israel,16
+Middle East & North Africa,United Arab Emirates,13
+Middle East & North Africa,Malta,4
+Middle East & North Africa,Lebanon,1
+Middle East & North Africa,Morocco,1
+North America,Canada,235
+North America,United States,173
+Sub-Saharan Africa,Ghana,18
+Sub-Saharan Africa,South Africa,1

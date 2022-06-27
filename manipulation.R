@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------------------##
 ##Author:   Emily McGovern
 ##Date:     June 2022
-##Task:     Data manipulation task for recruitment process
+##Task:     Data manipulation for recruitment process
 ##Data Source: https://raw.githubusercontent.com/globaldothealth/monkeypox/main/latest.csv
 ##--------------------------------------------------------------------------------------------##
 
@@ -11,24 +11,26 @@ pacman::p_load(tidyverse,
                countrycode,
                janitor,
                lubridate,
+               zoo,
                here)
 
 #source required functions
-source(list.files(here::here("R/")))
-lapply(list.files(here::here("R"), full.names = T), source)
+list.files(here::here("R"), full.names = T) %>% 
+  map(~source(.))
+
 
 #make output dir
 out.dir<-format(Sys.Date(), "%d-%B-%y")
 
 #check if directory exists - if not create daily directory 
-if(!dir.exists(paste0(here("out/"), out.dir))) {dir.create(paste0(here("out/"), out.dir))}
+if(!dir.exists(paste0(here("out/Monkey-Pox/"), out.dir))) {dir.create(paste0(here("out/Monkey-Pox/"), out.dir))}
 
 #retrive latest Monkey Pox data
 mp.data <- read_csv("https://raw.githubusercontent.com/globaldothealth/monkeypox/main/latest.csv")
 
 #save daily data as record
 
-write.csv(mp.data, file=gzfile(paste0(here("out/"), out.dir, "/mpdata-", out.dir, ".csv.gz")))
+write.csv(mp.data, file=gzfile(paste0(here("out/Monkey-Pox/"), out.dir, "/mpdata-", out.dir, ".csv.gz")))
 
 
 #quick look at the data structure and fields
@@ -47,21 +49,26 @@ mp.cases<-mp.data %>%
   dplyr::count(name = "cases") %>%
   dplyr::arrange(Gender) %>%
   tidyr::pivot_wider(names_from = Gender, values_from= cases, values_fill = 0) %>%
-  janitor::adorn_totals(c("col")) %>%
+  janitor::adorn_totals(c("col", "row")) %>%
   dplyr::arrange(desc(Date_confirmation), desc(Total), Country)
+
+
+write_csv(mp.cases, file=(paste0(here("out/Monkey-Pox/"), out.dir, "/mpcases_summary-", out.dir, ".csv")))
 
 top.countries.per.reg<-mp.cases %>% 
   ungroup() %>% 
+  slice(1:n()-1) %>% 
   group_by(region,Country) %>% 
   summarise("total_cases"=sum(Total)) %>% 
   arrange(desc(total_cases)) %>% 
   slice(1:10)
 
+write_csv(top.countries.per.reg, file=(paste0(here("out/Monkey-Pox/"), out.dir, "/mpcases-top-ten-cases-by-country-region", out.dir, ".csv")))
 
 # initial plot
 p <-
   mp.cases %>% 
-  #slice(1:n()-1) %>% 
+  slice(1:n()-1) %>%
   dplyr::mutate(Date_confirmation = ymd(Date_confirmation),
                 top_10 = ifelse(Country %in% top.countries.per.reg$Country, Country, "Other")) %>% 
   ggplot(aes(x = Date_confirmation, y = Total, fill = top_10)) +
@@ -90,30 +97,10 @@ p <-
 p
 
 # Theme adjustments
-p <-
-  p +
-  scale_fill_manual(values = pal) +
-  theme_minimal()+
-  theme(
-    plot.margin = margin(1.5, 2.5, 0.5, 1.75, "cm"),
-    plot.title = element_text(hjust = 0.5, size = 30, face = 'bold'), 
-    plot.subtitle = element_text(hjust = 0.5, size = 20),
-    axis.text = element_text(size = 17, color = 'black', face = 'bold'), 
-    axis.text.x=element_text(angle=45,hjust=1, size = 17),
-    axis.title=element_text(size=17,face="bold"),
-    strip.text = element_text(size = 17, face = 'bold'), 
-    panel.grid = element_line(color = 'gray'), 
-    legend.position = 'bottom',
-    legend.key.width=unit(1,"cm"),
-    legend.key.height=unit(0.2,"cm"),
-    axis.ticks = element_line(colour = "grey70", size = 0.2),
-    panel.grid.major = element_line(colour = "grey70", size = 0.2),
-    panel.grid.minor = element_blank()
-  )
+p2<-plot_theme(p)
+
 
 # Save plot
-ggsave(filename = (paste0(here("out/"), out.dir, "/mpplot-", out.dir, ".png")), 
-       width = 40, height = 30, dpi = 320, units = "cm")
-
-
+ggsave(filename = (paste0(here("out/Monkey-Pox/"), out.dir, "/mpplot-", out.dir, ".png")), 
+       width = 40, height = 20, dpi = 320, units = "cm")
 
