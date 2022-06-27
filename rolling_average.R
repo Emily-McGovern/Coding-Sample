@@ -62,8 +62,9 @@ p<-p +
   ggplot2::labs(title = "Daily Confirmed Monkey Pox Cases with moving 7-day average", 
                 subtitle = paste0(format(min(roll.mp.case$Date_confirmation), "%b %d %Y"), " to ", format(get_last_weekdate(), "%b %d %Y")), 
                 caption = paste0("DATA SOURCE: Global.health Monkeypox (accessed on ",  format(Sys.Date(), "%Y-%m-%d"), ")"), 
-                y = "Average Count", 
-                x = "Date of Confirmation") 
+                y = "Case Count", 
+                x = "Date of Confirmation",
+                fill = "") 
 
 p2<-plot_theme(p)
 
