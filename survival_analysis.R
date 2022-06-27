@@ -4,7 +4,7 @@
 ## Task:     Statistical programming task for recruitment process - survival analysis
 ## Data Source: survival package R (https://cran.r-project.org/web/packages/survival/index.html)
 ##--------------------------------------------------------------------------------------------##
-#Data setup
+# Data setup
 require(pacman)
 pacman::p_load(tidyverse,
                ggpubr,
@@ -12,11 +12,11 @@ pacman::p_load(tidyverse,
                survminer,
                here)
 
-#output directory
+# output directory
 dir.name <- base::format(Sys.Date(), "%d-%B-%y")
 out.dir <- paste0(here("out/Survival-data/"), dir.name)
 
-#check if directory exists - if not create daily directory
+# check if directory exists - if not create daily directory
 if (!base::dir.exists(out.dir)) {
   base::dir.create(out.dir)
 }
@@ -34,10 +34,10 @@ data <- survival::veteran
 #age:	in years
 #prior:	prior therapy 0=no, 10=yes
 
-#explore data
+# explore data
 dplyr::glimpse(data)
 
-#data manipulation
+# data manipulation
 # data <- data %>%
 #   dplyr::mutate(
 #     type = case_when(prior == 10 ~ "treatment-naïve",
@@ -45,13 +45,13 @@ dplyr::glimpse(data)
 #     month = round(time / 30.417, digit = 0)
 #   )
 
-#Computes an estimate of a survival curve for censored data using the Kaplan-Meier method
+# Computes an estimate of a survival curve for censored data using the Kaplan-Meier method
 surv_obj <-
   survival::survfit(survival::Surv(month, status) ~ trt, data = data)
 
 base::summary(surv_obj)
 
-##plot survival curves
+# plot survival curves
 p <- survminer::ggsurvplot(
   fit = surv_obj,
   data = data,
@@ -73,13 +73,13 @@ p <- survminer::ggsurvplot(
               "#2E9FDF")
 )
 
-#extract plot from ggsurvplot object
+# extract plot from ggsurvplot object
 plot <- p$plot
 
-#extract risk table from ggsurvplot object
+# extract risk table from ggsurvplot object
 table <- p$table
 
-#arrange plot and risk table into one plot
+# arrange plot and risk table into one plot
 final.plot <- ggpubr::ggarrange(
   plot,
   table,
@@ -88,7 +88,7 @@ final.plot <- ggpubr::ggarrange(
   align = "v"
 )
 
-#save plot
+# save plot
 ggplot2::ggsave(
   filename = paste0(out.dir, "/surv-plot-", dir.name, ".png"),
   width = 40,
