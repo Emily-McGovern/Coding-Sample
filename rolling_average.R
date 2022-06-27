@@ -4,23 +4,23 @@
 ## Task:     Statisical task for recruitment process
 ## Data Source: https://raw.githubusercontent.com/globaldothealth/monkeypox/main/latest.csv
 ##--------------------------------------------------------------------------------------------##
-#Data setup
+# Data setup
 require(pacman)
 pacman::p_load(tidyverse,
                lubridate,
                zoo,
                here)
 
-#source required functions
+# source required functions
 list.files(here::here("R"), full.names = T) %>%
   purrr::map( ~ source(.))
 
 
-#make output dir
+# make output dir
 dir.name <- base::format(Sys.Date(), "%d-%B-%y")
 out.dir <- paste0(here("out/Monkey-Pox/"), dir.name)
 
-#check if directory exists - if not create daily directory
+# check if directory exists - if not create daily directory
 if (!base::dir.exists(out.dir)) {
   base::dir.create(out.dir)
 }
@@ -90,11 +90,11 @@ p <- p +
     fill = ""
   )
 
-#add theme
+# add theme
 p2 <- plot_theme(p)
 
 
-# Save plot
+# save plot
 ggplot2::ggsave(
   filename = (paste0(
     out.dir, "/mpplot-rolling_mean", dir.name, ".png"
