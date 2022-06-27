@@ -5,7 +5,7 @@
 ## Data Source: https://raw.githubusercontent.com/globaldothealth/monkeypox/main/latest.csv
 ##--------------------------------------------------------------------------------------------##
 
-#Data setup
+# Data setup
 require(pacman)
 pacman::p_load(tidyverse,
                countrycode,
@@ -14,16 +14,16 @@ pacman::p_load(tidyverse,
                zoo,
                here)
 
-#source required functions
+# source required functions
 base::list.files(here::here("R"), full.names = T) %>%
   purrr::map( ~ source(.))
 
 
-#make output dir
+# make output dir
 dir.name <- base::format(Sys.Date(), "%d-%B-%y")
 out.dir <- paste0(here("out/Monkey-Pox/"), dir.name)
 
-#check if directory exists - if not create daily directory
+# check if directory exists - if not create daily directory
 if (!base::dir.exists(out.dir)) {
   base::dir.create(out.dir)
 }
@@ -32,18 +32,17 @@ if (!base::dir.exists(out.dir)) {
 mp.data <-
   readr::read_csv("https://raw.githubusercontent.com/globaldothealth/monkeypox/main/latest.csv")
 
-#save daily data as record
-
+# save daily data as record
 utils::write.csv(mp.data, file = gzfile(paste0(out.dir, "/mpdata-", dir.name, ".csv.gz")))
 
 
-#quick look at the data structure and fields
+# quick look at the data structure and fields
 dplyr::glimpse(mp.data)
 
-#look at MP data in more detail
+# look at MP data in more detail
 base::summary(mp.data)
 
-#create new required variables and tidy data
+# create new required variables and tidy data
 mp.cases <-
   mp.data %>%
   tidyr::replace_na(list(Gender = "unknown")) %>%
@@ -65,11 +64,12 @@ mp.cases <-
   janitor::adorn_totals(c("col", "row")) %>%
   dplyr::arrange(desc(Date_confirmation), desc(Total), Country)
 
-
+# save summary of cases by country and gender
 readr::write_csv(mp.cases, file = (paste0(
   out.dir, "/mpcases_summary-", dir.name, ".csv"
 )))
 
+# get top ten highest cases by country and region for plot
 top.countries.per.reg <-
   mp.cases %>%
   dplyr::ungroup() %>%
@@ -79,6 +79,7 @@ top.countries.per.reg <-
   dplyr::arrange(desc(total_cases)) %>%
   dplyr::slice(1:10)
 
+# write top ten highest cases by country and region for plot
 readr::write_csv(top.countries.per.reg, file = (
   paste0(
     out.dir,
@@ -88,7 +89,7 @@ readr::write_csv(top.countries.per.reg, file = (
   )
 ))
 
-
+# manipulate data for plot
 mp.cases.plot <-
   mp.cases %>%
   dplyr::slice(1:n() - 1) %>%
@@ -139,14 +140,14 @@ p <-
     fill = ''
   )
 
-# Quick Peek
+# quick Peek
 p
 
-# Theme adjustments
+# theme adjustments
 p <- plot_theme(p)
 
 
-# Save plot
+# save plot
 ggsave(
   filename = (paste0(out.dir, "/mpplot-", dir.name, ".png")),
   width = 40,
