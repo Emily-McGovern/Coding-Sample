@@ -1,7 +1,7 @@
 plot_theme<-function(plot){
   
   plot + 
-    scale_fill_manual(values = pal) +
+    ggplot2::scale_fill_manual(values = pal) +
     ggplot2::theme_minimal()+
     ggplot2::theme(
       plot.margin = margin(1.5, 2.5, 0.5, 1.75, "cm"),

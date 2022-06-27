@@ -1,24 +1,23 @@
 ##----------------------------------------------------------------------------------------##
 ##Author:   Emily McGovern
 ##Date:     June 2022
-##Task:     Statistical programming task for recruitment process
+##Task:     Statistical programming task for recruitment process - survival analysis
 ##Data Source: survival package R (https://cran.r-project.org/web/packages/survival/index.html)
 ##--------------------------------------------------------------------------------------------##
 #Data setup
 require(pacman)
 pacman::p_load(tidyverse,
-               janitor,
+               ggpubr,
                survival,
-               lubridate,
                survminer,
                here)
-
-out.dir<-format(Sys.Date(), "%d-%B-%y")
+#output directory 
+out.dir<-base::format(Sys.Date(), "%d-%B-%y")
 
 #check if directory exists - if not create daily directory 
-if(!dir.exists(paste0(here("out/Survival-data/"), out.dir))) {dir.create(paste0(here("out/Survival-data/"), out.dir))}
+if(!base::dir.exists(paste0(here("out/Survival-data/"), out.dir))) {base::dir.create(paste0(here("out/Survival-data/"), out.dir))}
 
-
+# use survival vetaran data 
 data <- survival::veteran
 
 ## Dataset Details
@@ -31,20 +30,22 @@ data <- survival::veteran
 #age:	in years
 #prior:	prior therapy 0=no, 10=yes
 
-
 #explore data
 dplyr::glimpse(data)
 
+#data manipulation
 data<-data %>% 
-  mutate(type = case_when(prior ==10 ~ "treatment-naïve",
-                          TRUE ~ "treatment-experienced"),
-         month = round(time/30.417, digit=0))
+  dplyr::mutate(type = case_when(prior ==10 ~ "treatment-naïve",
+                                 TRUE ~ "treatment-experienced"),
+                month = round(time/30.417, digit=0))
 
+#Computes an estimate of a survival curve for censored data using the Kaplan-Meier method
 surv_obj <- survival::survfit(survival::Surv(month, status) ~ trt, data = data)
 
-summary(surv_obj)
+base::summary(surv_obj)
 
-p<-ggsurvplot(
+##plot survival curves
+p<-survminer::ggsurvplot(
   fit = surv_obj,
   data = data,
   conf.int = TRUE, # plot the confidence interval of the survival probability
@@ -62,16 +63,19 @@ p<-ggsurvplot(
               "#2E9FDF")
 )
 
+#extract plot from ggsurvplot object
 plot<-p$plot
 
+#extract risk table from ggsurvplot object
 table<-p$table
 
-final.plot<-ggarrange(plot, table,
-                      nrow = 2,
-                      heights = c(1, 0.3, 0.5), align = "v")
+#arrange plot and risk table into one plot
+final.plot<-ggpubr::ggarrange(plot, table,
+                               nrow = 2,
+                               heights = c(1, 0.3, 0.5), align = "v")
 
-
-ggsave(filename = (paste0(here("out/Survival-data/"), out.dir, "/surv-plot-", out.dir, ".png")), 
-       width = 40, height = 20, dpi = 320, units = "cm")
+#save plot
+ggplot2::ggsave(filename = (paste0(here("out/Survival-data/"), out.dir, "/surv-plot-", out.dir, ".png")), 
+                width = 40, height = 20, dpi = 320, units = "cm")
 
 
