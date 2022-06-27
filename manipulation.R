@@ -119,7 +119,7 @@ p <-
   ggplot2::facet_wrap(vars(region))
 
 
-#quick peak
+# add title and caption text etc
 p <-
   p +
   labs(
@@ -143,7 +143,7 @@ p <-
 p
 
 # Theme adjustments
-p2 <- plot_theme(p)
+p <- plot_theme(p)
 
 
 # Save plot
