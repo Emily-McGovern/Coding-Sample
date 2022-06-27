@@ -12,14 +12,16 @@ pacman::p_load(tidyverse,
                survminer,
                here)
 
-#output directory 
-dir.name<-base::format(Sys.Date(), "%d-%B-%y")
-out.dir<-paste0(here("out/Survival-data/"),dir.name)
+#output directory
+dir.name <- base::format(Sys.Date(), "%d-%B-%y")
+out.dir <- paste0(here("out/Survival-data/"), dir.name)
 
-#check if directory exists - if not create daily directory 
-if(!base::dir.exists(out.dir)) {base::dir.create(out.dir)}
+#check if directory exists - if not create daily directory
+if (!base::dir.exists(out.dir)) {
+  base::dir.create(out.dir)
+}
 
-# use survival vetaran data 
+# use survival vetaran data
 data <- survival::veteran
 
 ## Dataset Details
@@ -36,29 +38,35 @@ data <- survival::veteran
 dplyr::glimpse(data)
 
 #data manipulation
-data<-data %>% 
-  dplyr::mutate(type = case_when(prior ==10 ~ "treatment-naïve",
-                                 TRUE ~ "treatment-experienced"),
-                month = round(time/30.417, digit=0))
+data <- data %>%
+  dplyr::mutate(
+    type = case_when(prior == 10 ~ "treatment-naïve",
+                     TRUE ~ "treatment-experienced"),
+    month = round(time / 30.417, digit = 0)
+  )
 
 #Computes an estimate of a survival curve for censored data using the Kaplan-Meier method
-surv_obj <- survival::survfit(survival::Surv(month, status) ~ trt, data = data)
+surv_obj <-
+  survival::survfit(survival::Surv(month, status) ~ trt, data = data)
 
 base::summary(surv_obj)
 
 ##plot survival curves
-p<-survminer::ggsurvplot(
+p <- survminer::ggsurvplot(
   fit = surv_obj,
   data = data,
-  conf.int = TRUE, # plot the confidence interval of the survival probability
-  risk.table = TRUE, # draw the risk table below the graph
+  conf.int = TRUE,
+  # plot the confidence interval of the survival probability
+  risk.table = TRUE,
+  # draw the risk table below the graph
   pval  = TRUE,
-  surv.median.line = "hv", # draw the survival median line horizontally & vertically
+  surv.median.line = "hv",
+  # draw the survival median line horizontally & vertically
   title = "Survial rate of treatment naïve v treatment experience ",
-  xlab = "Survival time (months)", 
+  xlab = "Survival time (months)",
   ylab = "Survival probability",
   legend.title = "",
-  risk.table.title ="",
+  risk.table.title = "",
   break.x.by = 4,
   break.y.by = 0.2,
   palette = c("#E7B800",
@@ -66,18 +74,25 @@ p<-survminer::ggsurvplot(
 )
 
 #extract plot from ggsurvplot object
-plot<-p$plot
+plot <- p$plot
 
 #extract risk table from ggsurvplot object
-table<-p$table
+table <- p$table
 
 #arrange plot and risk table into one plot
-final.plot<-ggpubr::ggarrange(plot, table,
-                               nrow = 2,
-                               heights = c(1, 0.3, 0.5), align = "v")
+final.plot <- ggpubr::ggarrange(
+  plot,
+  table,
+  nrow = 2,
+  heights = c(1, 0.3, 0.5),
+  align = "v"
+)
 
 #save plot
-ggplot2::ggsave(filename = paste0(out.dir, "/surv-plot-", dir.name, ".png"), 
-                width = 40, height = 20, dpi = 320, units = "cm")
-
-
+ggplot2::ggsave(
+  filename = paste0(out.dir, "/surv-plot-", dir.name, ".png"),
+  width = 40,
+  height = 20,
+  dpi = 320,
+  units = "cm"
+)
