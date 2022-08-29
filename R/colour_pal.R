@@ -1,4 +1,4 @@
-library(wesanderson)
+pacman::p_load(wesanderson)
 
 pal<- c(wes_palettes$FantasticFox1,
         wes_palettes$GrandBudapest2,
