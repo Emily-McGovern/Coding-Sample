@@ -38,12 +38,12 @@ data <- survival::veteran
 dplyr::glimpse(data)
 
 # data manipulation
-# data <- data %>%
-#   dplyr::mutate(
-#     type = case_when(prior == 10 ~ "treatment-naïve",
-#                      TRUE ~ "treatment-experienced"),
-#     month = round(time / 30.417, digit = 0)
-#   )
+data <- data %>%
+  dplyr::mutate(
+    type = case_when(prior == 10 ~ "treatment-naïve",
+                     TRUE ~ "treatment-experienced"),
+    month = round(time / 30.417, digit = 0)
+  )
 
 # Computes an estimate of a survival curve for censored data using the Kaplan-Meier method
 surv_obj <-
