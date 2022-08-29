@@ -5,7 +5,7 @@
 ## Data Source: https://raw.githubusercontent.com/globaldothealth/monkeypox/main/latest.csv
 ##--------------------------------------------------------------------------------------------##
 
-# Data setup
+# setup
 require(pacman)
 pacman::p_load(tidyverse,
                countrycode,
